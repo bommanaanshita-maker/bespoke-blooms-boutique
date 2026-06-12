@@ -122,7 +122,7 @@ function ProductPage() {
               Make it personal
             </div>
             <div className="mt-4 space-y-4">
-              {product.customization.map((field) => (
+              {product.customization.map((field: CustomizationField) => (
                 <CustomField key={field.key} field={field} value={custom[field.key] ?? ""} onChange={(v) => set(field.key, v)} />
               ))}
             </div>
