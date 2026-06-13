@@ -5,7 +5,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { cartTotal, useCart } from "@/lib/cart-store";
 
-export const Route = createFileRoute("/cart")({
+export const Route = createFileRoute("/_authenticated/cart")({
   head: () => ({ meta: [{ title: "Your cart — gifted." }] }),
   component: CartPage,
 });
