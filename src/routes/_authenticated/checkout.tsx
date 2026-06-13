@@ -84,7 +84,7 @@ function Checkout() {
     navigate({ to: "/orders/$id", params: { id: order.id } });
   };
 
-  if (items.length === 0 && !done) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -93,23 +93,6 @@ function Checkout() {
           <Link to="/shop" className="mt-6 inline-block text-sm text-primary underline">
             Browse gifts
           </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (done) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="mx-auto max-w-2xl px-5 py-32 text-center">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-blush-gradient text-primary-foreground shadow-card">
-            <Check className="h-7 w-7" />
-          </span>
-          <h1 className="mt-6 font-display text-4xl">Your gift is on its way</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            We'll send tracking details to your inbox in just a moment.
-          </p>
         </div>
       </div>
     );
