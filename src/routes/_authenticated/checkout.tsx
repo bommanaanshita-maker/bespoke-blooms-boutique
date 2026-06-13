@@ -1,10 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CreditCard, Landmark, Wallet, Truck, Check } from "lucide-react";
+import { CreditCard, Landmark, Wallet, Truck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { cartTotal, useCart } from "@/lib/cart-store";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
@@ -23,18 +25,63 @@ function Checkout() {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
   const navigate = useNavigate();
+  const { user } = useAuth();
   const subtotal = cartTotal(items);
   const shipping = subtotal > 999 || subtotal === 0 ? 0 : 79;
   const total = subtotal + shipping;
   const [method, setMethod] = useState("upi");
-  const [done, setDone] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setDone(true);
+    if (!user) return;
+    const fd = new FormData(e.currentTarget);
+    const g = (k: string) => String(fd.get(k) ?? "").trim();
+    setLoading(true);
+    const { data: order, error } = await supabase
+      .from("orders")
+      .insert({
+        user_id: user.id,
+        subtotal,
+        shipping,
+        total,
+        payment_method: method,
+        gift_message: g("giftMessage") || null,
+        delivery_date: g("date") || null,
+        ship_name: g("name"),
+        ship_phone: g("phone"),
+        ship_email: g("email"),
+        ship_line1: g("address"),
+        ship_city: g("city"),
+        ship_state: g("state"),
+        ship_pincode: g("pincode"),
+      })
+      .select("id")
+      .single();
+    if (error || !order) {
+      setLoading(false);
+      toast.error(error?.message || "Could not place order");
+      return;
+    }
+    const { error: itemsErr } = await supabase.from("order_items").insert(
+      items.map((i) => ({
+        order_id: order.id,
+        product_id: i.productId,
+        name: i.name,
+        image: i.image,
+        price: i.price,
+        qty: i.qty,
+        customization: i.customization ?? {},
+      })),
+    );
+    setLoading(false);
+    if (itemsErr) {
+      toast.error(itemsErr.message);
+      return;
+    }
     clear();
-    toast.success("Order placed! Confirmation on its way.");
-    setTimeout(() => navigate({ to: "/" }), 2200);
+    toast.success("Order placed!");
+    navigate({ to: "/orders/$id", params: { id: order.id } });
   };
 
   if (items.length === 0 && !done) {
