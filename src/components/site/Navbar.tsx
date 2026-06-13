@@ -30,6 +30,20 @@ export function Navbar() {
   const count = items.reduce((n, i) => n + i.qty, 0);
   const qc = useQueryClient();
 
+  const profile = useQuery({
+    queryKey: ["profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const notif = useQuery({
     queryKey: ["notifications", user?.id],
     enabled: !!user,
@@ -185,7 +199,7 @@ export function Navbar() {
                 className="grid h-10 w-10 place-items-center rounded-full bg-blush-gradient text-primary-foreground shadow-soft"
               >
                 <span className="text-xs font-semibold">
-                  {(user.user_metadata?.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                  {(profile.data?.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
                 </span>
               </button>
               <AnimatePresence>
