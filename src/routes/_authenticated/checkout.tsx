@@ -181,9 +181,10 @@ function Checkout() {
             </dl>
             <button
               type="submit"
-              className="w-full rounded-full bg-primary px-6 py-3.5 text-sm font-medium text-primary-foreground shadow-card transition-soft hover:opacity-95"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3.5 text-sm font-medium text-primary-foreground shadow-card transition-soft hover:opacity-95 disabled:opacity-60"
             >
-              Place order
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Place order"}
             </button>
           </aside>
         </form>
