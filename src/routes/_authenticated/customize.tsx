@@ -9,7 +9,7 @@ import { products } from "@/lib/products";
 import { useCart } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/customize")({
+export const Route = createFileRoute("/_authenticated/customize")({
   head: () => ({
     meta: [
       { title: "Custom gift builder — gifted." },

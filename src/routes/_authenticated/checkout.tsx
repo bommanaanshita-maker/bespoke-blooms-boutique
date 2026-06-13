@@ -7,7 +7,7 @@ import { Footer } from "@/components/site/Footer";
 import { cartTotal, useCart } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/checkout")({
+export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({ meta: [{ title: "Checkout — gifted." }] }),
   component: Checkout,
 });
