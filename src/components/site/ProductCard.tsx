@@ -1,14 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
-import { useCart } from "@/lib/cart-store";
+import { useWishlist } from "@/lib/wishlist";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const wishlist = useCart((s) => s.wishlist);
-  const toggle = useCart((s) => s.toggleWishlist);
-  const wished = wishlist.includes(product.id);
+  const { user } = useAuth();
+  const wl = useWishlist();
+  const navigate = useNavigate();
+  const wished = wl.has(product.id);
 
   return (
     <motion.article
@@ -41,7 +44,11 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             aria-label="Wishlist"
             onClick={(e) => {
               e.preventDefault();
-              toggle(product.id);
+              if (!user) {
+                navigate({ to: "/auth", search: { redirect: window.location.pathname } });
+                return;
+              }
+              wl.toggle(product.id);
             }}
             className={cn(
               "absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-background/90 text-foreground/70 shadow-soft backdrop-blur transition-soft hover:text-primary",

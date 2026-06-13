@@ -8,6 +8,8 @@ import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { getProduct, products, type CustomizationField } from "@/lib/products";
 import { useCart } from "@/lib/cart-store";
+import { useWishlist } from "@/lib/wishlist";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$id")({
@@ -46,8 +48,16 @@ function ProductPage() {
   const [qty, setQty] = useState(1);
   const [custom, setCustom] = useState<Record<string, string>>({});
   const add = useCart((s) => s.add);
-  const toggle = useCart((s) => s.toggleWishlist);
-  const wished = useCart((s) => s.wishlist.includes(product.id));
+  const { user } = useAuth();
+  const wl = useWishlist();
+  const toggle = (id: string) => {
+    if (!user) {
+      navigate({ to: "/auth", search: { redirect: window.location.pathname } });
+      return;
+    }
+    wl.toggle(id);
+  };
+  const wished = wl.has(product.id);
   const navigate = useNavigate();
 
   const set = (key: string, value: string) => setCustom((c) => ({ ...c, [key]: value }));
