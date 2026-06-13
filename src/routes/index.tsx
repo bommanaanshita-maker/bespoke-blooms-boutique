@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Gift, Heart, ShieldCheck, Sparkles, Truck, Star } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -293,6 +295,16 @@ function Testimonials() {
 }
 
 function Newsletter() {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      toast.success("You are subscribed! 🎁");
+      setEmail("");
+    }
+  };
+
   return (
     <section className="mx-auto max-w-7xl px-5 pb-16 pt-4 lg:px-8">
       <div className="overflow-hidden rounded-[2.5rem] bg-blush-gradient p-10 text-center text-primary-foreground sm:p-16">
@@ -304,11 +316,13 @@ function Newsletter() {
         </p>
         <form
           className="mx-auto mt-6 flex max-w-md flex-col gap-2 sm:flex-row"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubscribe}
         >
           <input
             type="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="you@email.com"
             className="flex-1 rounded-full bg-background/95 px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-background"
           />

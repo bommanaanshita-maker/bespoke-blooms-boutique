@@ -30,15 +30,15 @@ export type Product = {
 };
 
 export const categories = [
-  { slug: "birthday", name: "Birthday Gifts", emoji: "🎂", tint: "blush" },
-  { slug: "anniversary", name: "Anniversary", emoji: "💞", tint: "lavender" },
-  { slug: "kids", name: "Kids Gifts", emoji: "🧸", tint: "cream" },
-  { slug: "baby", name: "Baby Gifts", emoji: "🍼", tint: "blush" },
-  { slug: "cards", name: "Greeting Cards", emoji: "💌", tint: "lavender" },
-  { slug: "hampers", name: "Custom Hampers", emoji: "🧺", tint: "cream" },
-  { slug: "wedding", name: "Wedding Gifts", emoji: "💍", tint: "blush" },
-  { slug: "corporate", name: "Corporate", emoji: "🎁", tint: "lavender" },
-  { slug: "festival", name: "Festival", emoji: "✨", tint: "cream" },
+  { slug: "birthday", name: "Birthday Gifts", icon: "Cake", tint: "blush" },
+  { slug: "anniversary", name: "Anniversary", icon: "Heart", tint: "lavender" },
+  { slug: "kids", name: "Kids Gifts", icon: "Toy2", tint: "cream" },
+  { slug: "baby", name: "Baby Gifts", icon: "Baby", tint: "blush" },
+  { slug: "cards", name: "Greeting Cards", icon: "Mail", tint: "lavender" },
+  { slug: "hampers", name: "Custom Hampers", icon: "Package", tint: "cream" },
+  { slug: "wedding", name: "Wedding Gifts", icon: "Ring", tint: "blush" },
+  { slug: "corporate", name: "Corporate", icon: "Briefcase", tint: "lavender" },
+  { slug: "festival", name: "Festival", icon: "Sparkles", tint: "cream" },
 ];
 
 export const products: Product[] = [

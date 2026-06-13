@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Search, ShoppingBag, Sparkles, Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Package, MapPin } from "lucide-react";
-import { useState } from "react";
+import { Heart, ShoppingBag, Sparkles, Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Package, MapPin } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCart } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth";
 import { useWishlist } from "@/lib/wishlist";
@@ -20,10 +20,15 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [bell, setBell] = useState(false);
+  const [wishlistViewed, setWishlistViewed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("wishlist-viewed") === "true";
+  });
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const wl = useWishlist();
   const count = items.reduce((n, i) => n + i.qty, 0);
+  const qc = useQueryClient();
 
   const notif = useQuery({
     queryKey: ["notifications", user?.id],
@@ -38,7 +43,37 @@ export function Navbar() {
       return data;
     },
   });
+  
+  const markAsRead = useMutation({
+    mutationFn: async () => {
+      const unreadIds = (notif.data ?? []).filter((n) => !n.read).map((n) => n.id);
+      if (unreadIds.length === 0) return;
+      const { error } = await supabase.from("notifications").update({ read: true }).in("id", unreadIds);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
+
+  const handleWishlistClick = () => {
+    localStorage.setItem("wishlist-viewed", "true");
+    setWishlistViewed(true);
+  };
+
   const unread = (notif.data ?? []).filter((n) => !n.read).length;
+
+  // Track previous wishlist length to detect new items
+  const prevWishlistLengthRef = useRef(wl.ids.length);
+
+  useEffect(() => {
+    // If new items were added to wishlist, reset the viewed flag
+    if (wl.ids.length > prevWishlistLengthRef.current) {
+      localStorage.setItem("wishlist-viewed", "false");
+      setWishlistViewed(false);
+    }
+    prevWishlistLengthRef.current = wl.ids.length;
+  }, [wl.ids.length]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -65,13 +100,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <button
-            aria-label="Search"
-            className="hidden h-10 w-10 place-items-center rounded-full text-foreground/70 transition-soft hover:bg-muted hover:text-foreground md:grid"
-          >
-            <Search className="h-4 w-4" />
-          </button>
-
           {user && (
             <div className="relative">
               <button
@@ -79,6 +107,9 @@ export function Navbar() {
                 onClick={() => {
                   setBell((v) => !v);
                   setMenu(false);
+                  if (!bell && unread > 0) {
+                    markAsRead.mutate();
+                  }
                 }}
                 className="relative grid h-10 w-10 place-items-center rounded-full text-foreground/70 transition-soft hover:bg-muted hover:text-foreground"
               >
@@ -119,10 +150,11 @@ export function Navbar() {
           <Link
             to={user ? "/wishlist" : "/auth"}
             aria-label="Wishlist"
+            onClick={handleWishlistClick}
             className="relative grid h-10 w-10 place-items-center rounded-full text-foreground/70 transition-soft hover:bg-muted hover:text-foreground"
           >
             <Heart className="h-4 w-4" />
-            {user && wl.ids.length > 0 && (
+            {user && wl.ids.length > 0 && !wishlistViewed && (
               <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
                 {wl.ids.length}
               </span>

@@ -1,0 +1,19 @@
+# Vercel Ignore File
+# Files to exclude from Vercel deployments
+
+node_modules
+.git
+.gitignore
+.env.local
+.env.*.local
+dist
+build
+.vercel
+.vscode
+.idea
+*.log
+*.swp
+*.swo
+.DS_Store
+README.md
+DEPLOYMENT.md

@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { CreditCard, Landmark, Wallet, Truck, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CreditCard, Landmark, Wallet, Truck, Loader2, MapPin, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { cartTotal, useCart } from "@/lib/cart-store";
@@ -31,12 +32,76 @@ function Checkout() {
   const total = subtotal + shipping;
   const [method, setMethod] = useState("upi");
   const [loading, setLoading] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [showNewAddress, setShowNewAddress] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+    date: "",
+    giftMessage: "",
+  });
+
+  // Fetch saved addresses
+  const { data: addresses = [], isLoading: addressesLoading } = useQuery({
+    queryKey: ["addresses", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("addresses")
+        .select("*")
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Auto-select default address on load
+  useEffect(() => {
+    if (addresses.length > 0 && !selectedAddressId) {
+      const defaultAddr = addresses.find((a: any) => a.is_default);
+      const addrToSelect = defaultAddr || addresses[0];
+      setSelectedAddressId(addrToSelect.id);
+      setFormData({
+        name: addrToSelect.name,
+        phone: addrToSelect.phone,
+        email: formData.email,
+        address: addrToSelect.line1,
+        city: addrToSelect.city,
+        state: addrToSelect.state,
+        pincode: addrToSelect.pincode,
+        date: "",
+        giftMessage: "",
+      });
+    }
+  }, [addresses, selectedAddressId]);
+
+  const handleAddressSelect = (address: any) => {
+    setSelectedAddressId(address.id);
+    setShowNewAddress(false);
+    setFormData({
+      ...formData,
+      name: address.name,
+      phone: address.phone,
+      address: address.line1,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+    });
+  };
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) return;
-    const fd = new FormData(e.currentTarget);
-    const g = (k: string) => String(fd.get(k) ?? "").trim();
     setLoading(true);
     const { data: order, error } = await supabase
       .from("orders")
@@ -46,15 +111,15 @@ function Checkout() {
         shipping,
         total,
         payment_method: method,
-        gift_message: g("giftMessage") || null,
-        delivery_date: g("date") || null,
-        ship_name: g("name"),
-        ship_phone: g("phone"),
-        ship_email: g("email"),
-        ship_line1: g("address"),
-        ship_city: g("city"),
-        ship_state: g("state"),
-        ship_pincode: g("pincode"),
+        gift_message: formData.giftMessage || null,
+        delivery_date: formData.date || null,
+        ship_name: formData.name,
+        ship_phone: formData.phone,
+        ship_email: formData.email,
+        ship_line1: formData.address,
+        ship_city: formData.city,
+        ship_state: formData.state,
+        ship_pincode: formData.pincode,
       })
       .select("id")
       .single();
@@ -107,26 +172,114 @@ function Checkout() {
 
         <form onSubmit={submit} className="mt-10 grid gap-10 lg:grid-cols-[1fr_360px]">
           <div className="space-y-8">
-            <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
-              <h2 className="font-display text-xl">Shipping details</h2>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {[
-                  ["name", "Full name", "text"],
-                  ["phone", "Phone", "tel"],
-                  ["email", "Email", "email"],
-                  ["pincode", "Pincode", "text"],
-                ].map(([n, l, t]) => (
-                  <Input key={n} name={n} label={l} type={t} required />
-                ))}
-                <div className="sm:col-span-2">
-                  <Input name="address" label="Address" required />
+            {/* Saved Addresses Section */}
+            {!addressesLoading && addresses.length > 0 && !showNewAddress && (
+              <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
+                <h2 className="font-display text-xl">Saved addresses</h2>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {addresses.map((addr: any) => (
+                    <label
+                      key={addr.id}
+                      className={cn(
+                        "flex items-start gap-3 rounded-2xl border border-border bg-background p-4 cursor-pointer transition-soft hover:border-primary",
+                        selectedAddressId === addr.id && "border-primary bg-blush/20",
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="address-select"
+                        value={addr.id}
+                        checked={selectedAddressId === addr.id}
+                        onChange={() => handleAddressSelect(addr)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <p className="text-xs font-medium uppercase text-muted-foreground">{addr.label}</p>
+                        <p className="mt-1 font-medium">{addr.name}</p>
+                        <p className="text-sm text-muted-foreground">{addr.phone}</p>
+                        <p className="mt-1 text-sm">
+                          {addr.line1}
+                          {addr.line2 && <>, {addr.line2}</>}
+                          <br />
+                          {addr.city}, {addr.state} {addr.pincode}
+                        </p>
+                        {addr.is_default && (
+                          <p className="mt-2 text-[11px] font-medium text-primary">Default address</p>
+                        )}
+                      </div>
+                    </label>
+                  ))}
                 </div>
-                <Input name="city" label="City" required />
-                <Input name="state" label="State" required />
-                <Input name="date" label="Delivery date" type="date" />
-                <Input name="giftMessage" label="Gift message (optional)" />
+                <button
+                  type="button"
+                  onClick={() => setShowNewAddress(true)}
+                  className="mt-4 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+                >
+                  <Plus className="h-4 w-4" /> Use a new address
+                </button>
               </div>
-            </div>
+            )}
+
+            {/* Shipping Details Form */}
+            {(addresses.length === 0 || showNewAddress) && (
+              <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
+                <h2 className="font-display text-xl">Shipping details</h2>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {[
+                    ["name", "Full name", "text"],
+                    ["phone", "Phone", "tel"],
+                    ["email", "Email", "email"],
+                    ["pincode", "Pincode", "text"],
+                  ].map(([n, l, t]) => (
+                    <InputControlled
+                      key={n}
+                      name={n}
+                      label={l}
+                      type={t as string}
+                      value={formData[n as keyof typeof formData]}
+                      onChange={(v) => handleFormChange(n, v)}
+                      required
+                    />
+                  ))}
+                  <div className="sm:col-span-2">
+                    <InputControlled
+                      name="address"
+                      label="Address"
+                      value={formData.address}
+                      onChange={(v) => handleFormChange("address", v)}
+                      required
+                    />
+                  </div>
+                  <InputControlled
+                    name="city"
+                    label="City"
+                    value={formData.city}
+                    onChange={(v) => handleFormChange("city", v)}
+                    required
+                  />
+                  <InputControlled
+                    name="state"
+                    label="State"
+                    value={formData.state}
+                    onChange={(v) => handleFormChange("state", v)}
+                    required
+                  />
+                  <InputControlled
+                    name="date"
+                    label="Delivery date"
+                    type="date"
+                    value={formData.date}
+                    onChange={(v) => handleFormChange("date", v)}
+                  />
+                  <InputControlled
+                    name="giftMessage"
+                    label="Gift message (optional)"
+                    value={formData.giftMessage}
+                    onChange={(v) => handleFormChange("giftMessage", v)}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
               <h2 className="font-display text-xl">Payment method</h2>
@@ -191,6 +344,36 @@ function Checkout() {
       </section>
       <Footer />
     </div>
+  );
+}
+
+function InputControlled({
+  name,
+  label,
+  type = "text",
+  required,
+  value,
+  onChange,
+}: {
+  name: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-medium text-foreground/80">{label}</span>
+      <input
+        name={name}
+        type={type}
+        required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
+      />
+    </label>
   );
 }
 

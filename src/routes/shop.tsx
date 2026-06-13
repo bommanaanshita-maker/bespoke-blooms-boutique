@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Star } from "lucide-react";
+import { SlidersHorizontal, Star } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -31,7 +31,6 @@ const sorts = [
 
 function Shop() {
   const { category } = Route.useSearch();
-  const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | undefined>(category);
   const [sort, setSort] = useState<(typeof sorts)[number]["id"]>("popular");
   const [maxPrice, setMaxPrice] = useState(3000);
@@ -41,13 +40,12 @@ function Shop() {
   const list = useMemo(() => {
     let l = products.filter((p) => p.price <= maxPrice && p.rating >= minRating);
     if (cat) l = l.filter((p) => p.category === cat);
-    if (q) l = l.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
     if (sort === "low") l = [...l].sort((a, b) => a.price - b.price);
     if (sort === "high") l = [...l].sort((a, b) => b.price - a.price);
     if (sort === "new") l = [...l].reverse();
     if (sort === "popular") l = [...l].sort((a, b) => b.reviews - a.reviews);
     return l;
-  }, [q, cat, sort, maxPrice, minRating]);
+  }, [cat, sort, maxPrice, minRating]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -134,15 +132,6 @@ function Shop() {
 
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search gifts…"
-                className="w-full rounded-full border border-border bg-background py-3 pl-11 pr-4 text-sm focus:border-primary focus:outline-none"
-              />
-            </div>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as (typeof sorts)[number]["id"])}

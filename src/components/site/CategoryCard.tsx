@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tintBg: Record<string, string> = {
@@ -11,16 +12,18 @@ const tintBg: Record<string, string> = {
 export function CategoryCard({
   slug,
   name,
-  emoji,
+  icon,
   tint,
   index = 0,
 }: {
   slug: string;
   name: string;
-  emoji: string;
+  icon: string;
   tint: string;
   index?: number;
 }) {
+  const IconComponent = (Icons as Record<string, any>)[icon] || Icons.Package;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -36,9 +39,9 @@ export function CategoryCard({
           tintBg[tint] ?? "bg-muted",
         )}
       >
-        <span className="text-4xl transition-transform duration-500 ease-out group-hover:scale-110">
-          {emoji}
-        </span>
+        <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/50 transition-transform duration-500 ease-out group-hover:scale-110">
+          <IconComponent className="h-8 w-8 text-foreground" strokeWidth={1.5} />
+        </div>
         <span className="font-display text-sm leading-tight text-foreground">{name}</span>
       </Link>
     </motion.div>
