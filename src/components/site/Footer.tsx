@@ -4,7 +4,7 @@ import { Instagram, Facebook, Twitter, Sparkles } from "lucide-react";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-border/60 bg-muted/40">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-4 lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-3 gap-10 px-5 py-16 lg:grid-cols-4 lg:px-8 [&>div:first-child]:col-span-3 lg:[&>div:first-child]:col-span-1">
         <div>
           <Link to="/" className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-blush-gradient text-primary-foreground shadow-soft">
