@@ -86,39 +86,39 @@ function AdminAnalytics() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-8">
       <div>
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Reports</p>
-        <h1 className="mt-1 font-display text-3xl">Analytics</h1>
+        <h1 className="mt-1 font-display text-2xl sm:text-3xl">Analytics</h1>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((c, i) => (
           <motion.div
             key={c.label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="rounded-3xl bg-card p-6 shadow-soft"
+            className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6"
           >
             <span className="grid h-10 w-10 place-items-center rounded-full bg-blush/40">
               <c.Icon className="h-4 w-4" />
             </span>
             <p className="mt-4 text-xs text-muted-foreground">{c.label}</p>
-            <p className="font-display text-3xl">{c.value}</p>
+            <p className="font-display text-xl sm:text-3xl">{c.value}</p>
           </motion.div>
         ))}
       </div>
 
-      <div className="rounded-3xl bg-card p-6 shadow-soft">
+      <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-display text-xl">Revenue per Month</h2>
+            <h2 className="font-display text-lg sm:text-xl">Revenue per Month</h2>
             <p className="text-xs text-muted-foreground">Last 12 months</p>
           </div>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="mt-6 flex h-64 items-end gap-2">
+        <div className="mt-6 flex h-40 items-end gap-1 sm:h-64 sm:gap-2">
           {monthly.map((m) => (
             <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
               <motion.div
@@ -128,16 +128,16 @@ function AdminAnalytics() {
                 className="w-full rounded-t-md bg-blush-gradient"
                 title={`${m.label}: ₹${m.revenue.toLocaleString("en-IN")}`}
               />
-              <span className="text-[10px] text-muted-foreground">{m.label}</span>
+              <span className="text-[8px] text-muted-foreground sm:text-[10px]">{m.label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-3xl bg-card p-6 shadow-soft">
-        <h2 className="font-display text-xl">Category-wise Sales</h2>
+      <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
+        <h2 className="font-display text-lg sm:text-xl">Category-wise Sales</h2>
         <p className="text-xs text-muted-foreground">Revenue contribution</p>
-        <ul className="mt-5 space-y-4">
+        <ul className="mt-5 space-y-3 sm:space-y-4">
           {categoryData.length === 0 ? (
             <li className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
               No category sales yet.

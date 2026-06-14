@@ -44,10 +44,10 @@ function AdminCustomers() {
   }, [data.data, q]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Audience</p>
-        <h1 className="mt-1 font-display text-3xl">Customers</h1>
+        <h1 className="mt-1 font-display text-2xl sm:text-3xl">Customers</h1>
       </div>
 
       <div className="relative">
@@ -56,40 +56,40 @@ function AdminCustomers() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search by name or phone…"
-          className="h-11 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:border-primary"
+          className="h-10 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:border-primary sm:h-11"
         />
       </div>
 
-      <div className="overflow-hidden rounded-3xl bg-card shadow-soft">
+      <div className="overflow-hidden rounded-2xl bg-card shadow-soft sm:rounded-3xl">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[500px] text-left text-xs sm:text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-medium">Customer</th>
-                <th className="px-5 py-3 font-medium">Phone</th>
-                <th className="px-5 py-3 font-medium">Orders</th>
-                <th className="px-5 py-3 font-medium">Lifetime spend</th>
-                <th className="px-5 py-3 font-medium">Last order</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Customer</th>
+                <th className="hidden px-3 py-2 font-medium sm:table-cell sm:px-5 sm:py-3">Phone</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Orders</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Spend</th>
+                <th className="hidden px-3 py-2 font-medium md:table-cell md:px-5 md:py-3">Last order</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-16 text-center">
+                  <td colSpan={5} className="px-3 py-12 text-center sm:px-5 sm:py-16">
                     <Users className="mx-auto h-6 w-6 text-muted-foreground" />
-                    <p className="mt-2 text-sm text-muted-foreground">No customers yet.</p>
+                    <p className="mt-2 text-xs text-muted-foreground sm:text-sm">No customers yet.</p>
                   </td>
                 </tr>
               ) : (
                 rows.map((r) => (
                   <tr key={r.id} className="hover:bg-muted/30">
-                    <td className="px-5 py-3 font-medium">{r.full_name || "—"}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{r.phone || "—"}</td>
-                    <td className="px-5 py-3">{r.orders}</td>
-                    <td className="px-5 py-3 font-medium">
+                    <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">{r.full_name || "—"}</td>
+                    <td className="hidden px-3 py-2 text-muted-foreground sm:table-cell sm:px-5 sm:py-3">{r.phone || "—"}</td>
+                    <td className="px-3 py-2 sm:px-5 sm:py-3">{r.orders}</td>
+                    <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">
                       ₹{r.spend.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-5 py-3 text-muted-foreground">
+                    <td className="hidden px-3 py-2 text-muted-foreground md:table-cell md:px-5 md:py-3">
                       {r.last
                         ? new Date(r.last).toLocaleDateString("en-IN", {
                             day: "numeric",
