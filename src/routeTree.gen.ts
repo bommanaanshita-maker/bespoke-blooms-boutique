@@ -24,6 +24,7 @@ import { Route as AuthenticatedCustomizeRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AuthenticatedAddressesRouteImport } from './routes/_authenticated/addresses'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 
 const ShopRoute = ShopRouteImport.update({
@@ -100,6 +101,11 @@ const AuthenticatedAddressesRoute = AuthenticatedAddressesRouteImport.update({
   path: '/addresses',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/addresses': typeof AuthenticatedAddressesRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/addresses': typeof AuthenticatedAddressesRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRoute
   '/_authenticated/addresses': typeof AuthenticatedAddressesRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/shop'
+    | '/admin'
     | '/addresses'
     | '/cart'
     | '/checkout'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/shop'
+    | '/admin'
     | '/addresses'
     | '/cart'
     | '/checkout'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/shop'
+    | '/_authenticated/admin'
     | '/_authenticated/addresses'
     | '/_authenticated/cart'
     | '/_authenticated/checkout'
@@ -331,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAddressesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/$id': {
       id: '/_authenticated/orders/$id'
       path: '/$id'
@@ -353,6 +372,7 @@ const AuthenticatedOrdersRouteWithChildren =
   AuthenticatedOrdersRoute._addFileChildren(AuthenticatedOrdersRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRoute
   AuthenticatedAddressesRoute: typeof AuthenticatedAddressesRoute
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
   AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
@@ -364,6 +384,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRoute,
   AuthenticatedAddressesRoute: AuthenticatedAddressesRoute,
   AuthenticatedCartRoute: AuthenticatedCartRoute,
   AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
@@ -389,3 +410,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
