@@ -120,10 +120,17 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [invalidEmail, setInvalidEmail] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+
+  async function attemptSignIn(email: string, password: string) {
+    return supabase.auth.signInWithPassword({ email, password });
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
+    setInvalidEmail(null);
     const fd = new FormData(e.currentTarget);
     const parsed = loginSchema.safeParse(Object.fromEntries(fd));
     if (!parsed.success) {
@@ -133,14 +140,41 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    let { error } = await attemptSignIn(parsed.data.email, parsed.data.password);
+
+    // Seed the admin account on first sign-in attempt with the demo creds.
+    if (
+      error &&
+      parsed.data.email.toLowerCase() === ADMIN_EMAIL &&
+      /invalid/i.test(error.message)
+    ) {
+      try {
+        await bootstrapAdmin();
+        ({ error } = await attemptSignIn(parsed.data.email, parsed.data.password));
+      } catch (e) {
+        console.error("Admin bootstrap failed", e);
+      }
+    }
+
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      setInvalidEmail(parsed.data.email);
+      toast.error("Invalid email or password");
       return;
     }
     toast.success("Welcome back!");
     onSuccess();
+  }
+
+  async function handleQuickReset() {
+    if (!invalidEmail) return;
+    setResetting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(invalidEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetting(false);
+    if (error) toast.error(error.message);
+    else toast.success("Reset link sent — check your inbox.");
   }
 
   return (
@@ -167,6 +201,20 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
           Forgot password?
         </Link>
       </div>
+      {invalidEmail && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-xs">
+          <p className="font-medium text-destructive">Wrong password?</p>
+          <button
+            type="button"
+            disabled={resetting}
+            onClick={handleQuickReset}
+            className="mt-1 inline-flex items-center gap-1 text-primary hover:underline disabled:opacity-60"
+          >
+            {resetting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+            Send a password reset link to {invalidEmail}
+          </button>
+        </div>
+      )}
       <button
         disabled={loading}
         className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground shadow-card transition-soft hover:opacity-95 disabled:opacity-60"
@@ -176,6 +224,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
     </form>
   );
 }
+
 
 function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [show, setShow] = useState(false);
