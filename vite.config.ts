@@ -14,9 +14,5 @@ export default defineConfig({
   },
   nitro: {
     preset: "netlify",
-    prerender: {
-      crawlLinks: true,
-      routes: ["/", "/shop", "/auth"],
-    },
   },
 });
