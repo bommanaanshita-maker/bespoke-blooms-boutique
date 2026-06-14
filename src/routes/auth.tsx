@@ -43,10 +43,20 @@ function AuthPage() {
   const redirectTo = search.redirect || "/dashboard";
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) nav({ to: redirectTo as "/dashboard" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const target = await resolveRedirectForUser(data.session.user.id, redirectTo);
+      nav({ to: target as "/dashboard" });
     });
   }, [nav, redirectTo]);
+
+  async function handleSuccess() {
+    const { data } = await supabase.auth.getUser();
+    const target = data.user
+      ? await resolveRedirectForUser(data.user.id, redirectTo)
+      : redirectTo;
+    nav({ to: target as "/dashboard" });
+  }
 
   return (
     <div className="min-h-screen bg-hero-gradient">
@@ -74,15 +84,37 @@ function AuthPage() {
             ))}
           </div>
           {tab === "login" ? (
-            <LoginForm onSuccess={() => nav({ to: redirectTo as "/dashboard" })} />
+            <LoginForm onSuccess={handleSuccess} />
           ) : (
             <RegisterForm onSuccess={() => setTab("login")} />
           )}
+        </div>
+
+        <div className="mt-5 flex items-start gap-3 rounded-2xl bg-card/70 p-4 text-xs text-muted-foreground shadow-soft backdrop-blur">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <div>
+            <p className="font-medium text-foreground">Admin demo access</p>
+            <p className="mt-0.5">
+              Email <span className="font-mono">admin@gifted.com</span> · Password{" "}
+              <span className="font-mono">Admin@12345</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+async function resolveRedirectForUser(userId: string, fallback: string) {
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  return data ? "/admin" : fallback;
+}
+
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [show, setShow] = useState(false);
