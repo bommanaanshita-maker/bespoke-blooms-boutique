@@ -16,10 +16,6 @@ export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — gifted." }] }),
   component: AuthPage,
 });
-  validateSearch: (s) => searchSchema.parse(s),
-  head: () => ({ meta: [{ title: "Sign in — gifted." }] }),
-  component: AuthPage,
-});
 
 const registerSchema = z
   .object({
