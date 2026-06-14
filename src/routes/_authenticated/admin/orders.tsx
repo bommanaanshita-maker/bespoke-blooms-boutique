@@ -60,20 +60,20 @@ function AdminOrders() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Fulfilment</p>
-        <h1 className="mt-1 font-display text-3xl">All Orders</h1>
+        <h1 className="mt-1 font-display text-2xl sm:text-3xl">All Orders</h1>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:gap-3 lg:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search order #, customer, email…"
-            className="h-11 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:border-primary"
+            className="h-10 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:border-primary sm:h-11"
           />
         </div>
         <div className="relative">
@@ -81,7 +81,7 @@ function AdminOrders() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="h-11 rounded-full border border-border bg-card pl-11 pr-8 text-sm focus:outline-none focus:border-primary"
+            className="h-10 w-full rounded-full border border-border bg-card pl-11 pr-8 text-sm focus:outline-none focus:border-primary sm:h-11 sm:w-auto"
           >
             <option value="all">All statuses</option>
             {STATUSES.map((s) => (
@@ -93,59 +93,59 @@ function AdminOrders() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-3xl bg-card shadow-soft">
+      <div className="overflow-hidden rounded-2xl bg-card shadow-soft sm:rounded-3xl">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+          <table className="w-full min-w-[600px] text-left text-xs sm:text-sm">
+            <thead className="bg-muted/40 uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-medium">Order</th>
-                <th className="px-5 py-3 font-medium">Customer</th>
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 font-medium">Payment</th>
-                <th className="px-5 py-3 font-medium">Total</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Order</th>
+                <th className="hidden px-3 py-2 font-medium sm:table-cell sm:px-5 sm:py-3">Customer</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Date</th>
+                <th className="hidden px-3 py-2 font-medium md:table-cell md:px-5 md:py-3">Payment</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Total</th>
+                <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Status</th>
+                <th className="hidden px-3 py-2 sm:table-cell sm:px-5 sm:py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {orders.isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
                     Loading…
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
                     No matching orders.
                   </td>
                 </tr>
               ) : (
                 filtered.map((o) => (
                   <tr key={o.id} className="hover:bg-muted/30">
-                    <td className="px-5 py-3 font-medium">
-                      <Link to="/orders/$id" params={{ id: o.id }} className="hover:underline">
+                    <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">
+                      <Link to="/_authenticated/orders/$id" params={{ id: o.id }} className="hover:underline">
                         {o.order_number}
                       </Link>
                     </td>
-                    <td className="px-5 py-3">
-                      <p>{o.ship_name}</p>
+                    <td className="hidden px-3 py-2 sm:table-cell sm:px-5 sm:py-3">
+                      <p className="text-sm">{o.ship_name}</p>
                       <p className="text-xs text-muted-foreground">{o.ship_email}</p>
                     </td>
-                    <td className="px-5 py-3 text-muted-foreground">
+                    <td className="px-3 py-2 text-muted-foreground sm:px-5 sm:py-3">
                       {new Date(o.created_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-3 capitalize text-muted-foreground">{o.payment_method}</td>
-                    <td className="px-5 py-3 font-medium">₹{Number(o.total).toLocaleString("en-IN")}</td>
-                    <td className="px-5 py-3">
+                    <td className="hidden capitalize text-muted-foreground px-3 py-2 md:table-cell md:px-5 md:py-3">{o.payment_method}</td>
+                    <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">₹{Number(o.total).toLocaleString("en-IN")}</td>
+                    <td className="px-3 py-2 sm:px-5 sm:py-3">
                       <select
                         value={o.status}
                         onChange={(e) => update.mutate({ id: o.id, status: e.target.value })}
-                        className="rounded-full border border-border bg-background px-3 py-1 text-xs capitalize focus:outline-none focus:border-primary"
+                        className="rounded-full border border-border bg-background px-2 py-1 text-xs capitalize focus:outline-none focus:border-primary sm:px-3"
                       >
                         {STATUSES.map((s) => (
                           <option key={s} value={s}>
@@ -154,9 +154,9 @@ function AdminOrders() {
                         ))}
                       </select>
                     </td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="hidden px-3 py-2 text-right sm:table-cell sm:px-5 sm:py-3">
                       <Link
-                        to="/orders/$id"
+                        to="/_authenticated/orders/$id"
                         params={{ id: o.id }}
                         className="text-xs text-primary hover:underline"
                       >
@@ -165,6 +165,7 @@ function AdminOrders() {
                     </td>
                   </tr>
                 ))
+              )}
               )}
             </tbody>
           </table>

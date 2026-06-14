@@ -170,17 +170,17 @@ function Addresses() {
             <h2 className="font-display text-2xl">{editing.id ? "Edit address" : "New address"}</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Inp label="Label" value={editing.label} onChange={(v) => setEditing({ ...editing, label: v })} />
-              <Inp label="Full name" value={editing.name} onChange={(v) => setEditing({ ...editing, name: v })} required />
-              <Inp label="Phone" value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} required />
-              <Inp label="Pincode" value={editing.pincode} onChange={(v) => setEditing({ ...editing, pincode: v })} required />
+              <Inp label="Full name" value={editing.name} onChange={(v) => setEditing({ ...editing, name: v })} required pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" />
+              <Inp label="Phone" value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} required type="tel" pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" maxLength={10} />
+              <Inp label="Pincode" value={editing.pincode} onChange={(v) => setEditing({ ...editing, pincode: v })} required pattern="[0-9]{6}" title="Pincode must be exactly 6 digits" maxLength={6} />
               <div className="sm:col-span-2">
                 <Inp label="Address line 1" value={editing.line1} onChange={(v) => setEditing({ ...editing, line1: v })} required />
               </div>
               <div className="sm:col-span-2">
                 <Inp label="Address line 2 (optional)" value={editing.line2 ?? ""} onChange={(v) => setEditing({ ...editing, line2: v })} />
               </div>
-              <Inp label="City" value={editing.city} onChange={(v) => setEditing({ ...editing, city: v })} required />
-              <Inp label="State" value={editing.state} onChange={(v) => setEditing({ ...editing, state: v })} required />
+              <Inp label="City" value={editing.city} onChange={(v) => setEditing({ ...editing, city: v })} required pattern="[A-Za-z\s]+" title="City should only contain letters and spaces" />
+              <Inp label="State" value={editing.state} onChange={(v) => setEditing({ ...editing, state: v })} required pattern="[A-Za-z\s]+" title="State should only contain letters and spaces" />
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -213,18 +213,30 @@ function Inp({
   value,
   onChange,
   required,
+  type = "text",
+  pattern,
+  title,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   required?: boolean;
+  type?: string;
+  pattern?: string;
+  title?: string;
+  maxLength?: number;
 }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs font-medium text-foreground/80">{label}</span>
       <input
+        type={type}
         value={value}
         required={required}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
       />

@@ -83,7 +83,7 @@ function Orders() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 flex justify-end gap-2">
+                {/* <div className="mt-4 flex justify-end gap-2">
                   <Link
                     to="/orders/$id"
                     params={{ id: o.id }}
@@ -91,7 +91,7 @@ function Orders() {
                   >
                     View details
                   </Link>
-                </div>
+                </div> */}
               </li>
             ))}
           </ul>

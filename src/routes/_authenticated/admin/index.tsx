@@ -169,35 +169,35 @@ function AdminDashboard() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {cards.map((c, i) => (
           <motion.div
             key={c.label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="rounded-3xl bg-card p-5 shadow-soft"
+            className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-5"
           >
             <span className={`grid h-10 w-10 place-items-center rounded-full ${c.hue}`}>
               <c.Icon className="h-4 w-4" />
             </span>
-            <p className="mt-4 text-xs text-muted-foreground">{c.label}</p>
-            <p className="font-display text-2xl sm:text-3xl">{c.value}</p>
+            <p className="mt-3 text-xs text-muted-foreground">{c.label}</p>
+            <p className="font-display text-xl sm:text-2xl lg:text-3xl">{c.value}</p>
           </motion.div>
         ))}
       </div>
 
       {/* Charts row */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-3xl bg-card p-6 shadow-soft lg:col-span-2">
-          <div className="flex items-center justify-between">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6 lg:col-span-2">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <div>
-              <h2 className="font-display text-xl">Revenue & Orders</h2>
+              <h2 className="font-display text-lg sm:text-xl">Revenue & Orders</h2>
               <p className="text-xs text-muted-foreground">Last 6 months</p>
             </div>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="mt-6 flex h-56 items-end gap-3">
+          <div className="mt-4 flex h-40 items-end gap-2 sm:h-56 sm:gap-3">
             {monthly.map((m) => (
               <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
                 <div className="flex h-full w-full items-end justify-center gap-1">
@@ -230,10 +230,10 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="rounded-3xl bg-card p-6 shadow-soft">
-          <h2 className="font-display text-xl">Category Sales</h2>
+        <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
+          <h2 className="font-display text-lg sm:text-xl">Category Sales</h2>
           <p className="text-xs text-muted-foreground">Top performing categories</p>
-          <ul className="mt-5 space-y-4">
+          <ul className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
             {categoryShare.length === 0 ? (
               <li className="rounded-2xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
                 No category data yet
@@ -261,38 +261,38 @@ function AdminDashboard() {
       </div>
 
       {/* Recent orders + Notifications */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-3xl bg-card p-6 shadow-soft lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl">Recent Orders</h2>
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6 lg:col-span-2">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+            <h2 className="font-display text-lg sm:text-xl">Recent Orders</h2>
             <Link to="/admin/orders" className="text-xs text-primary hover:underline">
               View all
             </Link>
           </div>
-          <div className="mt-4 -mx-2 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="mt-4 -mx-2 overflow-x-auto sm:-mx-4 lg:-mx-0">
+            <table className="w-full min-w-[500px] text-left text-xs sm:text-sm">
+              <thead className="uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-2 py-2 font-medium">Order</th>
-                  <th className="px-2 py-2 font-medium">Customer</th>
-                  <th className="px-2 py-2 font-medium">Amount</th>
-                  <th className="px-2 py-2 font-medium">Status</th>
+                  <th className="px-2 py-2 font-medium sm:px-4">Order</th>
+                  <th className="px-2 py-2 font-medium sm:px-4">Customer</th>
+                  <th className="px-2 py-2 font-medium sm:px-4">Amount</th>
+                  <th className="px-2 py-2 font-medium sm:px-4">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {recent.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-2 py-12 text-center text-muted-foreground">
+                    <td colSpan={4} className="px-2 py-12 text-center text-muted-foreground sm:px-4">
                       No orders yet.
                     </td>
                   </tr>
                 ) : (
                   recent.map((o) => (
                     <tr key={o.id} className="hover:bg-muted/40">
-                      <td className="px-2 py-3 font-medium">{o.order_number}</td>
-                      <td className="px-2 py-3 text-muted-foreground">{o.ship_name}</td>
-                      <td className="px-2 py-3">₹{Number(o.total).toLocaleString("en-IN")}</td>
-                      <td className="px-2 py-3">
+                      <td className="px-2 py-2 font-medium sm:px-4 sm:py-3">{o.order_number}</td>
+                      <td className="px-2 py-2 text-muted-foreground sm:px-4 sm:py-3 line-clamp-1">{o.ship_name}</td>
+                      <td className="px-2 py-2 sm:px-4 sm:py-3">₹{Number(o.total).toLocaleString("en-IN")}</td>
+                      <td className="px-2 py-2 sm:px-4 sm:py-3">
                         <StatusPill status={o.status} />
                       </td>
                     </tr>
@@ -303,13 +303,13 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-3xl bg-card p-6 shadow-soft">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg">Notifications</h2>
+              <h2 className="font-display text-base sm:text-lg">Notifications</h2>
               <Bell className="h-4 w-4 text-muted-foreground" />
             </div>
-            <ul className="mt-4 space-y-3 text-sm">
+            <ul className="mt-3 space-y-2 text-xs sm:mt-4 sm:space-y-3 sm:text-sm">
               <Notification
                 Icon={Package}
                 tint="bg-blush/40"
@@ -331,20 +331,20 @@ function AdminDashboard() {
             </ul>
           </div>
 
-          <div className="rounded-3xl bg-card p-6 shadow-soft">
+          <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg">Occasion Reminders</h2>
+              <h2 className="font-display text-base sm:text-lg">Occasion Reminders</h2>
               <Cake className="h-4 w-4 text-muted-foreground" />
             </div>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-3">
               {reminders.map((r) => (
-                <li key={r.label} className="flex items-center gap-3">
-                  <span className={`grid h-9 w-9 place-items-center rounded-full ${r.tint}`}>
-                    <r.icon className="h-4 w-4" />
+                <li key={r.label} className="flex items-center gap-2 sm:gap-3">
+                  <span className={`grid h-8 w-8 flex-none place-items-center rounded-full text-sm sm:h-9 sm:w-9 ${r.tint}`}>
+                    <r.icon className="h-3.5 w-3.5" />
                   </span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{r.label}</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium sm:text-sm">{r.label}</p>
+                    <p className="text-[10px] text-muted-foreground sm:text-xs">
                       {r.daysAway === 0 ? "Today" : `In ${r.daysAway} days`}
                     </p>
                   </div>

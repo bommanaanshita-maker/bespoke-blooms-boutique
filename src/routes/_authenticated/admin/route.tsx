@@ -53,6 +53,19 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-cream/40">
       <div className="grid min-h-screen lg:grid-cols-[260px_1fr]">
+        {/* Mobile Header */}
+        <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl lg:hidden">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-blush-gradient text-primary-foreground">
+              <Sparkles className="h-3.5 w-3.5" />
+            </span>
+            <span className="font-display text-base">gifted.</span>
+          </Link>
+          <button className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
+            <Bell className="h-4 w-4" />
+          </button>
+        </header>
+
         <aside className="sticky top-0 hidden h-screen flex-col border-r border-border/60 bg-card p-5 lg:flex">
           <Link to="/" className="mb-8 flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-blush-gradient text-primary-foreground shadow-soft">
@@ -103,22 +116,12 @@ function AdminLayout() {
         </aside>
 
         <div className="flex min-h-screen flex-col">
-          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/60 bg-background/80 px-5 backdrop-blur-xl lg:px-8">
-            <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center gap-2 lg:hidden">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-blush-gradient text-primary-foreground">
-                  <Sparkles className="h-3.5 w-3.5" />
-                </span>
-                <span className="font-display text-lg">gifted.</span>
-              </Link>
-              <span className="hidden text-xs uppercase tracking-[0.2em] text-muted-foreground lg:inline">
-                Admin Console
-              </span>
-            </div>
+          <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-border/60 bg-background/80 px-5 backdrop-blur-xl lg:flex lg:px-8">
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Admin Console</span>
             <div className="flex items-center gap-2">
               <Link
                 to="/"
-                className="hidden rounded-full border border-border px-4 py-2 text-xs font-medium hover:bg-muted sm:inline-flex"
+                className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:bg-muted"
               >
                 View storefront
               </Link>
@@ -128,21 +131,21 @@ function AdminLayout() {
             </div>
           </header>
 
-          <main className="flex-1 px-5 py-8 lg:px-8">
+          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-5 lg:px-8 lg:py-8">
             <Outlet />
           </main>
 
-          <nav className="sticky bottom-0 z-30 grid grid-cols-4 border-t border-border/60 bg-background lg:hidden">
+          <nav className="sticky bottom-0 z-40 grid grid-cols-4 gap-1 border-t border-border/60 bg-background px-2 py-2 sm:grid-cols-4 lg:hidden">
             {items.map((m) => (
               <Link
                 key={m.to}
                 to={m.to}
-                activeProps={{ className: "text-primary" }}
+                activeProps={{ className: "text-primary bg-muted/50" }}
                 activeOptions={{ exact: m.exact }}
-                className="flex flex-col items-center gap-1 py-2.5 text-[10px] text-muted-foreground"
+                className="flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-[10px] font-medium text-muted-foreground transition-soft hover:bg-muted"
               >
-                <m.icon className="h-4 w-4" />
-                {m.label}
+                <m.icon className="h-5 w-5" />
+                <span className="line-clamp-1">{m.label}</span>
               </Link>
             ))}
           </nav>
