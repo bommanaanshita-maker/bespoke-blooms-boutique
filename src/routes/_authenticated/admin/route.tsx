@@ -5,7 +5,6 @@ import {
   Package,
   Users,
   BarChart3,
-  Bell,
   LogOut,
   Sparkles,
 } from "lucide-react";
@@ -61,9 +60,6 @@ function AdminLayout() {
             </span>
             <span className="font-display text-base">gifted.</span>
           </Link>
-          <button className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
-            <Bell className="h-4 w-4" />
-          </button>
         </header>
 
         <aside className="sticky top-0 hidden h-screen flex-col border-r border-border/60 bg-card p-5 lg:flex">
@@ -119,15 +115,6 @@ function AdminLayout() {
           <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-border/60 bg-background/80 px-5 backdrop-blur-xl lg:flex lg:px-8">
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Admin Console</span>
             <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:bg-muted"
-              >
-                View storefront
-              </Link>
-              <button className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
-                <Bell className="h-4 w-4" />
-              </button>
             </div>
           </header>
 

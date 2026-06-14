@@ -113,24 +113,43 @@ function AdminAnalytics() {
       <div className="rounded-2xl bg-card p-4 shadow-soft sm:rounded-3xl sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-display text-lg sm:text-xl">Revenue per Month</h2>
-            <p className="text-xs text-muted-foreground">Last 12 months</p>
+            <h2 className="font-display text-lg sm:text-xl">Revenue & Orders</h2>
+            <p className="text-xs text-muted-foreground">Last 6 months</p>
           </div>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="mt-6 flex h-40 items-end gap-1 sm:h-64 sm:gap-2">
-          {monthly.map((m) => (
+          {monthly.slice(-6).map((m) => (
             <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: `${(m.revenue / maxRev) * 100}%` }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="w-full rounded-t-md bg-blush-gradient"
-                title={`${m.label}: ₹${m.revenue.toLocaleString("en-IN")}`}
-              />
+              <div className="flex w-full items-end gap-1">
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: `${(m.revenue / maxRev) * 100}%` }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="flex-1 rounded-t-md bg-blush"
+                  title={`Revenue: ₹${m.revenue.toLocaleString("en-IN")}`}
+                />
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: `${(m.orders / Math.max(1, ...monthly.map((x) => x.orders))) * 100}%` }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="flex-1 rounded-t-md bg-lavender"
+                  title={`Orders: ${m.orders}`}
+                />
+              </div>
               <span className="text-[8px] text-muted-foreground sm:text-[10px]">{m.label}</span>
             </div>
           ))}
+        </div>
+        <div className="mt-4 flex gap-4">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-sm bg-blush" />
+            <span className="text-xs text-muted-foreground">Revenue</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-sm bg-lavender" />
+            <span className="text-xs text-muted-foreground">Orders</span>
+          </div>
         </div>
       </div>
 

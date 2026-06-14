@@ -226,19 +226,22 @@ function Checkout() {
                 <h2 className="font-display text-xl">Shipping details</h2>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {[
-                    ["name", "Full name", "text"],
-                    ["phone", "Phone", "tel"],
-                    ["email", "Email", "email"],
-                    ["pincode", "Pincode", "text"],
-                  ].map(([n, l, t]) => (
+                    ["name", "Full name", "text", "text", "[A-Za-z\\s]+", "Name should only contain letters and spaces"],
+                    ["phone", "Phone", "tel", "tel", "[0-9]{10}", "Phone number must be exactly 10 digits"],
+                    ["email", "Email", "email", "email", "", ""],
+                    ["pincode", "Pincode", "text", "text", "[0-9]{6}", "Pincode must be exactly 6 digits"],
+                  ].map(([n, l, t, inputType, pattern, title]) => (
                     <InputControlled
                       key={n}
                       name={n}
                       label={l}
-                      type={t as string}
+                      type={inputType as string}
                       value={formData[n as keyof typeof formData]}
                       onChange={(v) => handleFormChange(n, v)}
                       required
+                      pattern={pattern || undefined}
+                      title={title || undefined}
+                      maxLength={n === "phone" ? 10 : n === "pincode" ? 6 : undefined}
                     />
                   ))}
                   <div className="sm:col-span-2">
@@ -256,6 +259,8 @@ function Checkout() {
                     value={formData.city}
                     onChange={(v) => handleFormChange("city", v)}
                     required
+                    pattern="[A-Za-z\s]+"
+                    title="City should only contain letters and spaces"
                   />
                   <InputControlled
                     name="state"
@@ -263,6 +268,8 @@ function Checkout() {
                     value={formData.state}
                     onChange={(v) => handleFormChange("state", v)}
                     required
+                    pattern="[A-Za-z\s]+"
+                    title="State should only contain letters and spaces"
                   />
                   <InputControlled
                     name="date"
@@ -354,6 +361,9 @@ function InputControlled({
   required,
   value,
   onChange,
+  pattern,
+  title,
+  maxLength,
 }: {
   name: string;
   label: string;
@@ -361,6 +371,9 @@ function InputControlled({
   required?: boolean;
   value: string;
   onChange: (value: string) => void;
+  pattern?: string;
+  title?: string;
+  maxLength?: number;
 }) {
   return (
     <label className="block">
@@ -369,6 +382,9 @@ function InputControlled({
         name={name}
         type={type}
         required={required}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
@@ -382,11 +398,17 @@ function Input({
   label,
   type = "text",
   required,
+  pattern,
+  title,
+  maxLength,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
+  pattern?: string;
+  title?: string;
+  maxLength?: number;
 }) {
   return (
     <label className="block">
@@ -395,6 +417,9 @@ function Input({
         name={name}
         type={type}
         required={required}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
         className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
       />
     </label>

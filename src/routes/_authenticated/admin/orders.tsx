@@ -104,19 +104,19 @@ function AdminOrders() {
                 <th className="hidden px-3 py-2 font-medium md:table-cell md:px-5 md:py-3">Payment</th>
                 <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Total</th>
                 <th className="px-3 py-2 font-medium sm:px-5 sm:py-3">Status</th>
-                <th className="hidden px-3 py-2 sm:table-cell sm:px-5 sm:py-3" />
+
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {orders.isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
+                  <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
                     Loading…
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
+                  <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground sm:px-5 sm:py-12">
                     No matching orders.
                   </td>
                 </tr>
@@ -124,7 +124,7 @@ function AdminOrders() {
                 filtered.map((o) => (
                   <tr key={o.id} className="hover:bg-muted/30">
                     <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">
-                      <Link to="/_authenticated/orders/$id" params={{ id: o.id }} className="hover:underline">
+                      <Link to="/orders/$id" params={{ id: o.id }} className="hover:underline">
                         {o.order_number}
                       </Link>
                     </td>
@@ -154,18 +154,9 @@ function AdminOrders() {
                         ))}
                       </select>
                     </td>
-                    <td className="hidden px-3 py-2 text-right sm:table-cell sm:px-5 sm:py-3">
-                      <Link
-                        to="/_authenticated/orders/$id"
-                        params={{ id: o.id }}
-                        className="text-xs text-primary hover:underline"
-                      >
-                        View
-                      </Link>
-                    </td>
+
                   </tr>
                 ))
-              )}
               )}
             </tbody>
           </table>

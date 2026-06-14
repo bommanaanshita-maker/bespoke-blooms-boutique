@@ -14,7 +14,6 @@ import {
   Cake,
   Heart,
   Sparkles,
-  Plus,
   ListChecks,
   Truck,
   BarChart3,
@@ -415,7 +414,6 @@ function AdminDashboard() {
               { to: "/admin/orders", icon: ListChecks, label: "Manage Orders" },
               { to: "/admin/orders", icon: Truck, label: "Track Deliveries" },
               { to: "/admin/analytics", icon: BarChart3, label: "View Reports" },
-              { to: "/shop", icon: Plus, label: "View Catalog" },
             ].map((a) => (
               <Link
                 key={a.label}
