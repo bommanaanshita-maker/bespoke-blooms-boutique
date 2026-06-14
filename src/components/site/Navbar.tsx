@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, ShoppingBag, Sparkles, Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Package, MapPin } from "lucide-react";
+import { Heart, ShoppingBag, Sparkles, Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Package, MapPin, ShieldCheck } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCart } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth";
 import { useWishlist } from "@/lib/wishlist";
+import { useIsAdmin } from "@/lib/use-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const wl = useWishlist();
+  const isAdmin = useIsAdmin();
   const count = items.reduce((n, i) => n + i.qty, 0);
   const qc = useQueryClient();
 
@@ -211,6 +213,9 @@ export function Navbar() {
                     className="absolute right-0 mt-2 w-56 rounded-2xl border border-border bg-popover p-1.5 shadow-lift"
                   >
                     {[
+                      ...(isAdmin.data
+                        ? [{ to: "/admin", icon: ShieldCheck, label: "Admin Dashboard" }]
+                        : []),
                       { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
                       { to: "/orders", icon: Package, label: "My orders" },
                       { to: "/wishlist", icon: Heart, label: "Wishlist" },

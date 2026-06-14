@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { bootstrapAdmin } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
+
+const ADMIN_EMAIL = "admin@gifted.com";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
@@ -40,10 +43,20 @@ function AuthPage() {
   const redirectTo = search.redirect || "/dashboard";
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) nav({ to: redirectTo as "/dashboard" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const target = await resolveRedirectForUser(data.session.user.id, redirectTo);
+      nav({ to: target as "/dashboard" });
     });
   }, [nav, redirectTo]);
+
+  async function handleSuccess() {
+    const { data } = await supabase.auth.getUser();
+    const target = data.user
+      ? await resolveRedirectForUser(data.user.id, redirectTo)
+      : redirectTo;
+    nav({ to: target as "/dashboard" });
+  }
 
   return (
     <div className="min-h-screen bg-hero-gradient">
@@ -71,24 +84,53 @@ function AuthPage() {
             ))}
           </div>
           {tab === "login" ? (
-            <LoginForm onSuccess={() => nav({ to: redirectTo as "/dashboard" })} />
+            <LoginForm onSuccess={handleSuccess} />
           ) : (
             <RegisterForm onSuccess={() => setTab("login")} />
           )}
+        </div>
+
+        <div className="mt-5 flex items-start gap-3 rounded-2xl bg-card/70 p-4 text-xs text-muted-foreground shadow-soft backdrop-blur">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <div>
+            <p className="font-medium text-foreground">Admin demo access</p>
+            <p className="mt-0.5">
+              Email <span className="font-mono">admin@gifted.com</span> · Password{" "}
+              <span className="font-mono">Admin@12345</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+async function resolveRedirectForUser(userId: string, fallback: string) {
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  return data ? "/admin" : fallback;
+}
+
+
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [invalidEmail, setInvalidEmail] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+
+  async function attemptSignIn(email: string, password: string) {
+    return supabase.auth.signInWithPassword({ email, password });
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
+    setInvalidEmail(null);
     const fd = new FormData(e.currentTarget);
     const parsed = loginSchema.safeParse(Object.fromEntries(fd));
     if (!parsed.success) {
@@ -98,14 +140,41 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    let { error } = await attemptSignIn(parsed.data.email, parsed.data.password);
+
+    // Seed the admin account on first sign-in attempt with the demo creds.
+    if (
+      error &&
+      parsed.data.email.toLowerCase() === ADMIN_EMAIL &&
+      /invalid/i.test(error.message)
+    ) {
+      try {
+        await bootstrapAdmin();
+        ({ error } = await attemptSignIn(parsed.data.email, parsed.data.password));
+      } catch (e) {
+        console.error("Admin bootstrap failed", e);
+      }
+    }
+
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      setInvalidEmail(parsed.data.email);
+      toast.error("Invalid email or password");
       return;
     }
     toast.success("Welcome back!");
     onSuccess();
+  }
+
+  async function handleQuickReset() {
+    if (!invalidEmail) return;
+    setResetting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(invalidEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetting(false);
+    if (error) toast.error(error.message);
+    else toast.success("Reset link sent — check your inbox.");
   }
 
   return (
@@ -132,6 +201,20 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
           Forgot password?
         </Link>
       </div>
+      {invalidEmail && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-xs">
+          <p className="font-medium text-destructive">Wrong password?</p>
+          <button
+            type="button"
+            disabled={resetting}
+            onClick={handleQuickReset}
+            className="mt-1 inline-flex items-center gap-1 text-primary hover:underline disabled:opacity-60"
+          >
+            {resetting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+            Send a password reset link to {invalidEmail}
+          </button>
+        </div>
+      )}
       <button
         disabled={loading}
         className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground shadow-card transition-soft hover:opacity-95 disabled:opacity-60"
@@ -141,6 +224,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
     </form>
   );
 }
+
 
 function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [show, setShow] = useState(false);
@@ -172,7 +256,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       toast.error(error.message);
       return;
     }
-    toast.success("Account created! Check your email to confirm, then sign in.");
+    toast.success("Account created! You can sign in right away.");
     onSuccess();
   }
 
