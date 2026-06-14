@@ -35,7 +35,7 @@ function AdminDashboard() {
     queryKey: ["admin-summary"],
     queryFn: async () => {
       const [orders, items, customers] = await Promise.all([
-        supabase.from("orders").select("id, status, total, created_at, ship_name, order_number"),
+        supabase.from("orders").select("id, user_id, status, total, created_at, ship_name, order_number"),
         supabase.from("order_items").select("product_id, name, qty, price"),
         supabase.from("profiles").select("id, full_name"),
       ]);
