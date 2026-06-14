@@ -1,14 +1,21 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { bootstrapAdmin } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
+
+const ADMIN_EMAIL = "admin@gifted.com";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s) => searchSchema.parse(s),
+  head: () => ({ meta: [{ title: "Sign in — gifted." }] }),
+  component: AuthPage,
+});
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({ meta: [{ title: "Sign in — gifted." }] }),
   component: AuthPage,
