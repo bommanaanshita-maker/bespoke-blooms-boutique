@@ -49,7 +49,7 @@ function AdminDashboard() {
   const stats = useMemo(() => {
     const o = summary.data?.orders ?? [];
     const total = o.length;
-    const pending = o.filter((x) => ["pending", "confirmed", "processing"].includes(x.status)).length;
+    const pending = o.filter((x) => ["placed", "pending", "confirmed", "processing"].includes(x.status)).length;
     const delivered = o.filter((x) => x.status === "delivered").length;
     const cancelled = o.filter((x) => x.status === "cancelled").length;
     const revenue = o
