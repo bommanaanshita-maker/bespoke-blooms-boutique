@@ -62,25 +62,31 @@ function Checkout() {
     },
   });
 
+  // Prefill email from authenticated user
+  useEffect(() => {
+    if (user?.email && !formData.email) {
+      setFormData((prev) => ({ ...prev, email: user.email ?? "" }));
+    }
+  }, [user]);
+
   // Auto-select default address on load
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddressId) {
       const defaultAddr = addresses.find((a: any) => a.is_default);
       const addrToSelect = defaultAddr || addresses[0];
       setSelectedAddressId(addrToSelect.id);
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         name: addrToSelect.name,
         phone: addrToSelect.phone,
-        email: formData.email,
         address: addrToSelect.line1,
         city: addrToSelect.city,
         state: addrToSelect.state,
         pincode: addrToSelect.pincode,
-        date: "",
-        giftMessage: "",
-      });
+      }));
     }
   }, [addresses, selectedAddressId]);
+
 
   const handleAddressSelect = (address: any) => {
     setSelectedAddressId(address.id);
@@ -153,11 +159,26 @@ function Checkout() {
       toast.error(err instanceof Error ? err.message : "Could not add order items");
       return;
     }
+    // Save address for future orders if user has none yet
+    if (addresses.length === 0) {
+      await supabase.from("addresses").insert({
+        user_id: user.id,
+        label: "Home",
+        name: formData.name,
+        phone: formData.phone,
+        line1: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        is_default: true,
+      });
+    }
     setLoading(false);
     clear();
     toast.success("Order placed!");
     navigate({ to: "/orders/$id", params: { id: order.id } });
   };
+
 
   if (items.length === 0) {
     return (
@@ -281,22 +302,30 @@ function Checkout() {
                     pattern="[A-Za-z\s]+"
                     title="State should only contain letters and spaces"
                   />
-                  <InputControlled
-                    name="date"
-                    label="Delivery date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(v) => handleFormChange("date", v)}
-                  />
-                  <InputControlled
-                    name="giftMessage"
-                    label="Gift message (optional)"
-                    value={formData.giftMessage}
-                    onChange={(v) => handleFormChange("giftMessage", v)}
-                  />
                 </div>
               </div>
             )}
+
+            {/* Always-shown delivery preferences */}
+            <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
+              <h2 className="font-display text-xl">Delivery preferences</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <InputControlled
+                  name="date"
+                  label="Delivery date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(v) => handleFormChange("date", v)}
+                />
+                <InputControlled
+                  name="giftMessage"
+                  label="Gift message (optional)"
+                  value={formData.giftMessage}
+                  onChange={(v) => handleFormChange("giftMessage", v)}
+                />
+              </div>
+            </div>
+
 
             <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
               <h2 className="font-display text-xl">Payment method</h2>
