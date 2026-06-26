@@ -63,8 +63,8 @@ function Profile() {
           }}
           className="mt-8 space-y-4 rounded-3xl bg-card p-6 shadow-soft sm:p-8"
         >
-          <Field label="Full name" value={name} onChange={setName} />
-          <Field label="Phone" value={phone} onChange={setPhone} type="tel" />
+          <Field label="Full name" value={name} onChange={(v) => setName(v.replace(/[^A-Za-z\s]/g, ""))} pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" />
+          <Field label="Phone" value={phone} onChange={(v) => setPhone(v.replace(/\D/g, "").slice(0, 10))} type="tel" inputMode="numeric" pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" maxLength={10} />
           <Field label="Email" value={user?.email ?? ""} onChange={() => {}} disabled />
           <button
             disabled={save.isPending}
@@ -85,12 +85,20 @@ function Field({
   onChange,
   type = "text",
   disabled,
+  pattern,
+  title,
+  maxLength,
+  inputMode,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   disabled?: boolean;
+  pattern?: string;
+  title?: string;
+  maxLength?: number;
+  inputMode?: "text" | "numeric" | "tel" | "email" | "decimal" | "search" | "url" | "none";
 }) {
   return (
     <label className="block">
@@ -99,6 +107,10 @@ function Field({
         value={value}
         type={type}
         disabled={disabled}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
+        inputMode={inputMode}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none disabled:opacity-60"
       />
