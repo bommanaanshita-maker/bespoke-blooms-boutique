@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, Filter } from "lucide-react";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/admin/orders")({
 });
 
 const STATUSES = [
-  "pending",
+  "placed",
   "confirmed",
   "processing",
   "packed",
@@ -124,9 +124,7 @@ function AdminOrders() {
                 filtered.map((o) => (
                   <tr key={o.id} className="hover:bg-muted/30">
                     <td className="px-3 py-2 font-medium sm:px-5 sm:py-3">
-                      <Link to="/orders/$id" params={{ id: o.id }} className="hover:underline">
-                        {o.order_number}
-                      </Link>
+                      {o.order_number}
                     </td>
                     <td className="hidden px-3 py-2 sm:table-cell sm:px-5 sm:py-3">
                       <p className="text-sm">{o.ship_name}</p>
