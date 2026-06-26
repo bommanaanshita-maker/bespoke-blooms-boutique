@@ -8,6 +8,7 @@ import { Footer } from "@/components/site/Footer";
 import { cartTotal, useCart } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { createOrderItems } from "@/lib/checkout.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
@@ -128,22 +129,26 @@ function Checkout() {
       toast.error(error?.message || "Could not place order");
       return;
     }
-    const { error: itemsErr } = await supabase.from("order_items").insert(
-      items.map((i) => ({
-        order_id: order.id,
-        product_id: i.productId,
-        name: i.name,
-        image: i.image,
-        price: i.price,
-        qty: i.qty,
-        customization: i.customization ?? {},
-      })),
-    );
-    setLoading(false);
-    if (itemsErr) {
-      toast.error(itemsErr.message);
+    try {
+      await createOrderItems({
+        data: {
+          orderId: order.id,
+          items: items.map((i) => ({
+            productId: i.productId,
+            name: i.name,
+            image: i.image,
+            price: i.price,
+            qty: i.qty,
+            customization: (i.customization ?? {}) as never,
+          })),
+        },
+      });
+    } catch (err) {
+      setLoading(false);
+      toast.error(err instanceof Error ? err.message : "Could not add order items");
       return;
     }
+    setLoading(false);
     clear();
     toast.success("Order placed!");
     navigate({ to: "/orders/$id", params: { id: order.id } });

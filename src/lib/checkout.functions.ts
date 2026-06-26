@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/require-auth";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 
 type IncomingItem = {
   productId: string;
@@ -7,7 +8,7 @@ type IncomingItem = {
   image: string;
   price: number;
   qty: number;
-  customization?: Record<string, unknown> | null;
+  customization?: Json | null;
 };
 
 type Payload = { orderId: string; items: IncomingItem[] };
@@ -18,6 +19,7 @@ type Payload = { orderId: string; items: IncomingItem[] };
  * direct client INSERT policy so users cannot mutate items after checkout.
  */
 export const createOrderItems = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: Payload) => {
     if (!data || typeof data.orderId !== "string" || !Array.isArray(data.items)) {
       throw new Error("Invalid payload");
@@ -25,9 +27,9 @@ export const createOrderItems = createServerFn({ method: "POST" })
     if (data.items.length === 0) throw new Error("No items to add");
     return data;
   })
-  .handler(async ({ data }) => {
-    const { user } = await requireSupabaseAuth();
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const userId = context.userId;
 
     // Verify order ownership AND that it has no items yet (only the
     // creation flow may seed items — never an after-the-fact append).
@@ -37,7 +39,7 @@ export const createOrderItems = createServerFn({ method: "POST" })
       .eq("id", data.orderId)
       .maybeSingle();
     if (orderErr) throw new Error(orderErr.message);
-    if (!order || order.user_id !== user.id) throw new Error("Order not found");
+    if (!order || order.user_id !== userId) throw new Error("Order not found");
 
     const { count, error: countErr } = await supabaseAdmin
       .from("order_items")
@@ -53,7 +55,7 @@ export const createOrderItems = createServerFn({ method: "POST" })
       image: i.image,
       price: i.price,
       qty: i.qty,
-      customization: i.customization ?? {},
+      customization: (i.customization ?? {}) as Json,
     }));
 
     const { error } = await supabaseAdmin.from("order_items").insert(rows);
