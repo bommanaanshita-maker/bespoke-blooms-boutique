@@ -159,11 +159,26 @@ function Checkout() {
       toast.error(err instanceof Error ? err.message : "Could not add order items");
       return;
     }
+    // Save address for future orders if user has none yet
+    if (addresses.length === 0) {
+      await supabase.from("addresses").insert({
+        user_id: user.id,
+        label: "Home",
+        name: formData.name,
+        phone: formData.phone,
+        line1: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        is_default: true,
+      });
+    }
     setLoading(false);
     clear();
     toast.success("Order placed!");
     navigate({ to: "/orders/$id", params: { id: order.id } });
   };
+
 
   if (items.length === 0) {
     return (
