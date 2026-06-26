@@ -302,22 +302,30 @@ function Checkout() {
                     pattern="[A-Za-z\s]+"
                     title="State should only contain letters and spaces"
                   />
-                  <InputControlled
-                    name="date"
-                    label="Delivery date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(v) => handleFormChange("date", v)}
-                  />
-                  <InputControlled
-                    name="giftMessage"
-                    label="Gift message (optional)"
-                    value={formData.giftMessage}
-                    onChange={(v) => handleFormChange("giftMessage", v)}
-                  />
                 </div>
               </div>
             )}
+
+            {/* Always-shown delivery preferences */}
+            <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
+              <h2 className="font-display text-xl">Delivery preferences</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <InputControlled
+                  name="date"
+                  label="Delivery date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(v) => handleFormChange("date", v)}
+                />
+                <InputControlled
+                  name="giftMessage"
+                  label="Gift message (optional)"
+                  value={formData.giftMessage}
+                  onChange={(v) => handleFormChange("giftMessage", v)}
+                />
+              </div>
+            </div>
+
 
             <div className="rounded-3xl bg-card p-6 shadow-soft sm:p-8">
               <h2 className="font-display text-xl">Payment method</h2>
