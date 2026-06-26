@@ -63,7 +63,7 @@ function AdminLayout() {
         </header>
 
         <aside className="sticky top-0 hidden h-screen flex-col border-r border-border/60 bg-card p-5 lg:flex">
-          <Link to="/" className="mb-8 flex items-center gap-2">
+          <Link to="/admin" className="mb-8 flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-blush-gradient text-primary-foreground shadow-soft">
               <Sparkles className="h-4 w-4" />
             </span>
