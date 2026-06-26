@@ -62,25 +62,31 @@ function Checkout() {
     },
   });
 
+  // Prefill email from authenticated user
+  useEffect(() => {
+    if (user?.email && !formData.email) {
+      setFormData((prev) => ({ ...prev, email: user.email ?? "" }));
+    }
+  }, [user]);
+
   // Auto-select default address on load
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddressId) {
       const defaultAddr = addresses.find((a: any) => a.is_default);
       const addrToSelect = defaultAddr || addresses[0];
       setSelectedAddressId(addrToSelect.id);
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         name: addrToSelect.name,
         phone: addrToSelect.phone,
-        email: formData.email,
         address: addrToSelect.line1,
         city: addrToSelect.city,
         state: addrToSelect.state,
         pincode: addrToSelect.pincode,
-        date: "",
-        giftMessage: "",
-      });
+      }));
     }
   }, [addresses, selectedAddressId]);
+
 
   const handleAddressSelect = (address: any) => {
     setSelectedAddressId(address.id);
