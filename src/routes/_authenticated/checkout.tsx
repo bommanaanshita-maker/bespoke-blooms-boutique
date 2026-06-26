@@ -97,7 +97,12 @@ function Checkout() {
   };
 
   const handleFormChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    let v = value;
+    if (field === "phone") v = value.replace(/\D/g, "").slice(0, 10);
+    else if (field === "pincode") v = value.replace(/\D/g, "").slice(0, 6);
+    else if (field === "name" || field === "city" || field === "state")
+      v = value.replace(/[^A-Za-z\s]/g, "");
+    setFormData((prev) => ({ ...prev, [field]: v }));
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
