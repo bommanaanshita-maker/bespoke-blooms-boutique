@@ -89,6 +89,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "gifted. — personalised gifts for every occasion" },
+      { name: "description", content: "Gilded Gifts is a modern, elegant e-commerce platform for browsing, customizing, and ordering personalized gifts." },
+      { property: "og:description", content: "Gilded Gifts is a modern, elegant e-commerce platform for browsing, customizing, and ordering personalized gifts." },
+      { name: "twitter:description", content: "Gilded Gifts is a modern, elegant e-commerce platform for browsing, customizing, and ordering personalized gifts." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/54a15510-1aed-4a7f-9aa0-625d66295218/id-preview-488a274d--9e67aa8b-a4d3-449a-a7c9-2fea599bad53.lovable.app-1782616885669.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/54a15510-1aed-4a7f-9aa0-625d66295218/id-preview-488a274d--9e67aa8b-a4d3-449a-a7c9-2fea599bad53.lovable.app-1782616885669.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
