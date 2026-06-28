@@ -118,20 +118,20 @@ function AdminAnalytics() {
           </div>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="mt-6 flex h-40 items-end gap-1 sm:h-64 sm:gap-2">
+        <div className="mt-6 flex h-40 items-stretch gap-1 sm:h-64 sm:gap-2">
           {monthly.slice(-6).map((m) => (
             <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
-              <div className="flex w-full items-end gap-1">
+              <div className="flex min-h-0 w-full flex-1 items-end gap-1">
                 <motion.div
                   initial={{ height: 0 }}
-                  animate={{ height: `${(m.revenue / maxRev) * 100}%` }}
+                  animate={{ height: `${Math.max((m.revenue / maxRev) * 100, m.revenue > 0 ? 4 : 0)}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="flex-1 rounded-t-md bg-blush"
                   title={`Revenue: ₹${m.revenue.toLocaleString("en-IN")}`}
                 />
                 <motion.div
                   initial={{ height: 0 }}
-                  animate={{ height: `${(m.orders / Math.max(1, ...monthly.map((x) => x.orders))) * 100}%` }}
+                  animate={{ height: `${Math.max((m.orders / Math.max(1, ...monthly.map((x) => x.orders))) * 100, m.orders > 0 ? 4 : 0)}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="flex-1 rounded-t-md bg-lavender"
                   title={`Orders: ${m.orders}`}

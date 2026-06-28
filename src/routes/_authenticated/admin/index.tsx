@@ -196,20 +196,20 @@ function AdminDashboard() {
             </div>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="mt-4 flex h-40 items-end gap-2 sm:h-56 sm:gap-3">
+          <div className="mt-4 flex h-40 items-stretch gap-2 sm:h-56 sm:gap-3">
             {monthly.map((m) => (
               <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
-                <div className="flex h-full w-full items-end justify-center gap-1">
+                <div className="flex min-h-0 w-full flex-1 items-end justify-center gap-1">
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${(m.revenue / maxRev) * 100}%` }}
+                    animate={{ height: `${Math.max((m.revenue / maxRev) * 100, m.revenue > 0 ? 4 : 0)}%` }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                     className="w-3 rounded-t-md bg-blush-gradient"
                     title={`₹${m.revenue.toLocaleString("en-IN")}`}
                   />
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${(m.orders / maxOrd) * 100}%` }}
+                    animate={{ height: `${Math.max((m.orders / maxOrd) * 100, m.orders > 0 ? 4 : 0)}%` }}
                     transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
                     className="w-3 rounded-t-md bg-lavender/80"
                     title={`${m.orders} orders`}
