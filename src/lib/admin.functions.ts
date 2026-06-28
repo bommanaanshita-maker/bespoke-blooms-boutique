@@ -9,6 +9,11 @@ const ADMIN_PASSWORD = "Admin@12345";
  * a fixed seed account, never escalates anyone else).
  */
 export const bootstrapAdmin = createServerFn({ method: "POST" }).handler(async () => {
+  // Skip silently when running outside Lovable Cloud (e.g. local dev without
+  // the service role key configured). The admin seed only runs on hosted env.
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.SUPABASE_URL) {
+    return { ok: false, skipped: true, email: ADMIN_EMAIL };
+  }
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   // Look up by email via listUsers (admin API)
